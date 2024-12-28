@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">neon</string>
+    <string name="editor_text_hint">Enter text to display</string>
+    <string name="display_button_name">Display</string>
+    <string name="default_text">Hello</string>
+    <string name="font_size">Font Size</string>
+    <string name="font_color">Font Color</string>
+    <string name="speed">Speed</string>
+    <string name="background_color">background</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">霓虹灯</string>
+    <string name="editor_text_hint">请输入展示内容</string>
+    <string name="display_button_name">展示</string>
+    <string name="default_text">你好</string>
+    <string name="font_size">字体大小</string>
+    <string name="font_color">字体颜色</string>
+    <string name="speed">滚动速度</string>
+    <string name="background_color">背景</string>
+</resources>
