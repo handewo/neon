@@ -1,12 +1,12 @@
 # Neon
 
-Neon could show slogans and banners in fullscreen.
+A simple app which scroll text on full screen.
 
 ## Features
 
 * Ad free.
 * No need any permission.
-* Customize color of font and background.
+* Customize color of font,background and scrolling speed.
 ## Roadmap
 
 * support scrolling horizontal
