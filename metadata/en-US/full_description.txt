@@ -1,0 +1,8 @@
+<b>A simple app which scroll text on full screen.</b>
+
+Features:
+<ul>
+<li>Ads free.</li>
+<li>No need any permission.</li>
+<li>Customize color of font and background.</li>
+</ul>
