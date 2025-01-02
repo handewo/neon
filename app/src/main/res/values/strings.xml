@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">neon</string>
+    <string name="app_name">Neon</string>
     <string name="editor_text_hint">Enter text to display</string>
     <string name="display_button_name">Display</string>
     <string name="default_text">Hello</string>
