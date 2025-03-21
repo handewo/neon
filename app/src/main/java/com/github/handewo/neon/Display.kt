@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
+import android.util.Log
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.LinearInterpolator
@@ -89,7 +90,9 @@ class DisplayActivity : AppCompatActivity() {
             screenWidth.toFloat(),
             -textWidth
         )
-        animation.duration = speed * 10 // Adjust duration as needed
+
+        Log.d("Editor", "Speed: "+(20450-speed*10).toString())
+        animation.duration =  20450 - speed * 10 // Adjust duration as needed
         animation.repeatCount = ObjectAnimator.INFINITE
         animation.repeatMode = ObjectAnimator.RESTART
         animation.interpolator = LinearInterpolator()
