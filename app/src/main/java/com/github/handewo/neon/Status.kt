@@ -1,5 +1,7 @@
 package com.github.handewo.neon
 
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -13,6 +15,7 @@ data class EditorStatus(
     val fontColor: Int,
     val speed:Long,
     val bgColor:Int,
+    val cutout:Boolean,
 )
 
 // Create a DAO to access the database
@@ -28,7 +31,7 @@ interface EditorStatusDao {
     suspend fun getLastStatus(): EditorStatus?
 }
 
-@Database(entities = [EditorStatus::class], version = 1)
+@Database(entities = [EditorStatus::class], version = 2)
 abstract class AppDatabase : androidx.room.RoomDatabase() {
     abstract fun editorStatusDao(): EditorStatusDao
 
@@ -42,10 +45,17 @@ abstract class AppDatabase : androidx.room.RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "editor_database"
-                ).build()
+                ).addMigrations(MIGRATION_1_2).build()
                 INSTANCE = instance
                 instance
             }
         }
+    }
+}
+
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Adding a new column called "cutout"
+        db.execSQL("ALTER TABLE editor_status ADD COLUMN cutout Boolean")
     }
 }

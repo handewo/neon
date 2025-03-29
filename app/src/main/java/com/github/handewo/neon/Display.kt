@@ -26,13 +26,13 @@ class DisplayActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_display)
         val displayView = findViewById<View>(R.id.display_scroll)
-
+        val cutoutMode = intent.getBooleanExtra("CUTOUT", false)
         window.attributes.layoutInDisplayCutoutMode =
             WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
         val rootView = window.decorView.findViewById<ViewGroup>(android.R.id.content)
         rootView.setOnApplyWindowInsetsListener { _, insets ->
             val cutout = insets.displayCutout
-            if (cutout != null) {
+            if (cutout != null && !cutoutMode) {
                 // Adjust layout to cover the cutout area
                 displayView.setPadding(
                     cutout.safeInsetLeft,

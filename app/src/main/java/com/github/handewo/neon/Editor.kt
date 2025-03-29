@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
@@ -21,6 +22,7 @@ class EditorActivity : AppCompatActivity() {
     private var fontColor = 0xFF000000.toInt()
     private var bgColor = 0xFFFFFFFF.toInt()
     private var speed: Long = 200
+    private var cutout: Boolean = false
 
 
     private fun updateEditorFontColor() {
@@ -49,6 +51,7 @@ class EditorActivity : AppCompatActivity() {
         val displayButton = findViewById<Button>(R.id.display_button)
         val fontColorButton = findViewById<Button>(R.id.font_color_button)
         val bgColorButton = findViewById<Button>(R.id.background_color_button)
+        val cutoutSwitch = findViewById<SwitchMaterial>(R.id.cutout_switch)
         // Restore editor status
         lifecycleScope.launch {
             val db = AppDatabase.getDatabase(applicationContext)
@@ -62,6 +65,7 @@ class EditorActivity : AppCompatActivity() {
                 speedSeekBar.progress = (lastStatus.speed - 5).toInt()
                 fontColor = lastStatus.fontColor
                 bgColor = lastStatus.bgColor
+                cutout = lastStatus.cutout
                 updateEditorFontColor()
                 updateEditorBgColor()
             } else {
@@ -72,7 +76,8 @@ class EditorActivity : AppCompatActivity() {
                     fontSize = fontSize,
                     fontColor = fontColor,
                     speed = speed,
-                    bgColor = bgColor
+                    bgColor = bgColor,
+                    cutout=cutout
                 )
                 editorStatusDao.insert(editorStatus)
             }
@@ -118,7 +123,12 @@ class EditorActivity : AppCompatActivity() {
             intent.putExtra("FONT_COLOR", fontColor)
             intent.putExtra("BG_COLOR", bgColor)
             intent.putExtra("SPEED", speed)
+            intent.putExtra("CUTOUT", cutout)
             startActivity(intent)
+        }
+
+        cutoutSwitch.setOnCheckedChangeListener { _, isChecked ->
+            cutout = isChecked
         }
 
 
@@ -154,7 +164,8 @@ class EditorActivity : AppCompatActivity() {
                 fontSize = fontSize,
                 fontColor = fontColor,
                 speed = speed,
-                bgColor = bgColor
+                bgColor = bgColor,
+                cutout=cutout
             )
             Log.d("EditorActivity", "Saving editor status: $editorStatus")
             editorStatusDao.update(editorStatus)

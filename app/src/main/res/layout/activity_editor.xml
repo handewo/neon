@@ -21,9 +21,9 @@
     <LinearLayout
         android:id="@+id/font_size_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50sp"
         android:layout_below="@id/editor_text"
-        android:layout_marginVertical="12sp"
+        android:layout_marginVertical="5sp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -46,9 +46,9 @@
     <LinearLayout
         android:id="@+id/scrolling_speed"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50sp"
         android:layout_below="@id/font_size_layout"
-        android:layout_marginVertical="12sp"
+        android:layout_marginVertical="5sp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -72,7 +72,8 @@
         android:id="@+id/color_button"
         style="?android:attr/buttonBarStyle"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50sp"
+        android:layout_marginVertical="5sp"
         android:layout_below="@id/scrolling_speed"
         android:layout_centerHorizontal="true"
         android:gravity="center_vertical"
@@ -95,11 +96,28 @@
             android:text="@string/background_color" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/linear_switch_wrapper"
+        style="?android:attr/switchStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="50sp"
+        android:layout_marginVertical="5sp"
+        android:layout_below="@id/color_button"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cutout_switch"
+            android:text="@string/cutouts"/>
+    </LinearLayout>
+
     <Button
         android:id="@+id/display_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/color_button"
+        android:layout_below="@id/linear_switch_wrapper"
         android:layout_centerHorizontal="true"
         android:text="@string/display_button_name" />
 
