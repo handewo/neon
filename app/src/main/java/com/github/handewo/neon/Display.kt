@@ -64,6 +64,7 @@ class DisplayActivity : AppCompatActivity() {
         val fontColor = intent.getIntExtra("FONT_COLOR", 0xFF000000.toInt())
         val bgColor = intent.getIntExtra("BG_COLOR", 0xFFFFFFFF.toInt())
         val speed = intent.getLongExtra("SPEED", 200)
+        val shadow = intent.getFloatExtra("SHADOW", 30f)
 
         displayView.setBackgroundColor(bgColor)
         displayText.text = neonText
@@ -73,7 +74,7 @@ class DisplayActivity : AppCompatActivity() {
         // Set neon-like color and glow
         displayText.setTextColor(fontColor)
         displayText.setShadowLayer(
-            30f,
+            shadow,
             0f,
             0f,
             fontColor

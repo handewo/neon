@@ -23,12 +23,13 @@ class EditorActivity : AppCompatActivity() {
     private var bgColor = 0xFFFFFFFF.toInt()
     private var speed: Long = 200
     private var cutout: Boolean = false
+    private var shadow=30f
 
 
     private fun updateEditorFontColor() {
         editText?.setTextColor(fontColor)
         editText?.setShadowLayer(
-            30f,
+            shadow,
             0f,
             0f,
             fontColor
@@ -52,6 +53,7 @@ class EditorActivity : AppCompatActivity() {
         val fontColorButton = findViewById<Button>(R.id.font_color_button)
         val bgColorButton = findViewById<Button>(R.id.background_color_button)
         val cutoutSwitch = findViewById<SwitchMaterial>(R.id.cutout_switch)
+        val shadowSeekBar = findViewById<SeekBar>(R.id.shadow_seekbar)
         // Restore editor status
         lifecycleScope.launch {
             val db = AppDatabase.getDatabase(applicationContext)
@@ -63,9 +65,13 @@ class EditorActivity : AppCompatActivity() {
                 editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, lastStatus.fontSize.toFloat())
                 fontSizeSeekBar.progress = lastStatus.fontSize - 10
                 speedSeekBar.progress = (lastStatus.speed - 5).toInt()
+                shadowSeekBar.progress=lastStatus.shadow.toInt()
+                cutoutSwitch.isChecked = lastStatus.cutout
+                speed = lastStatus.speed
                 fontColor = lastStatus.fontColor
                 bgColor = lastStatus.bgColor
                 cutout = lastStatus.cutout
+                shadow = lastStatus.shadow
                 updateEditorFontColor()
                 updateEditorBgColor()
             } else {
@@ -77,7 +83,8 @@ class EditorActivity : AppCompatActivity() {
                     fontColor = fontColor,
                     speed = speed,
                     bgColor = bgColor,
-                    cutout=cutout
+                    cutout=cutout,
+                    shadow=shadow
                 )
                 editorStatusDao.insert(editorStatus)
             }
@@ -124,6 +131,7 @@ class EditorActivity : AppCompatActivity() {
             intent.putExtra("BG_COLOR", bgColor)
             intent.putExtra("SPEED", speed)
             intent.putExtra("CUTOUT", cutout)
+            intent.putExtra("SHADOW", shadow)
             startActivity(intent)
         }
 
@@ -137,6 +145,22 @@ class EditorActivity : AppCompatActivity() {
                 fontSize = 10 + progress // Update selected font size
 
                 editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        shadowSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                shadow = progress.toFloat()
+
+                editText?.setShadowLayer(
+                    shadow,
+                    0f,
+                    0f,
+                    fontColor
+                )
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -165,7 +189,8 @@ class EditorActivity : AppCompatActivity() {
                 fontColor = fontColor,
                 speed = speed,
                 bgColor = bgColor,
-                cutout=cutout
+                cutout=cutout,
+                shadow=shadow
             )
             Log.d("EditorActivity", "Saving editor status: $editorStatus")
             editorStatusDao.update(editorStatus)
