@@ -3,10 +3,10 @@
     <string name="editor_text_hint">Enter text to display</string>
     <string name="display_button_name">Display</string>
     <string name="default_text">Hello</string>
-    <string name="font_size">Font Size</string>
-    <string name="font_color">Font Color</string>
+    <string name="font_size">Font size</string>
+    <string name="font_color">Font color</string>
     <string name="speed">Speed</string>
     <string name="cutouts">Extend to cutout</string>
-    <string name="background_color">background</string>
-    <string name="shadow">shadow</string>
+    <string name="background_color">Background</string>
+    <string name="shadow">Shadow</string>
 </resources>

@@ -10,9 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
+import com.google.android.material.slider.Slider
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
+import java.math.RoundingMode
+import java.text.NumberFormat
 
 class EditorActivity : AppCompatActivity() {
 
@@ -23,7 +26,7 @@ class EditorActivity : AppCompatActivity() {
     private var bgColor = 0xFFFFFFFF.toInt()
     private var speed: Long = 200
     private var cutout: Boolean = false
-    private var shadow=30f
+    private var shadow = 30f
 
 
     private fun updateEditorFontColor() {
@@ -47,13 +50,13 @@ class EditorActivity : AppCompatActivity() {
 
 
         editText = findViewById<TextInputEditText>(R.id.editor_text)
-        val fontSizeSeekBar = findViewById<SeekBar>(R.id.font_size_seekbar)
-        val speedSeekBar = findViewById<SeekBar>(R.id.speed_seekbar)
+        val fontSizeSeekBar = findViewById<Slider>(R.id.font_size_seekbar)
+        val speedSeekBar = findViewById<Slider>(R.id.speed_seekbar)
         val displayButton = findViewById<Button>(R.id.display_button)
         val fontColorButton = findViewById<Button>(R.id.font_color_button)
         val bgColorButton = findViewById<Button>(R.id.background_color_button)
         val cutoutSwitch = findViewById<SwitchMaterial>(R.id.cutout_switch)
-        val shadowSeekBar = findViewById<SeekBar>(R.id.shadow_seekbar)
+        val shadowSeekBar = findViewById<Slider>(R.id.shadow_seekbar)
         // Restore editor status
         lifecycleScope.launch {
             val db = AppDatabase.getDatabase(applicationContext)
@@ -63,10 +66,11 @@ class EditorActivity : AppCompatActivity() {
                 Log.d("EditorActivity", "last editor status: $lastStatus")
                 editText?.setText(lastStatus.text)
                 editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, lastStatus.fontSize.toFloat())
-                fontSizeSeekBar.progress = lastStatus.fontSize - 10
-                speedSeekBar.progress = (lastStatus.speed - 5).toInt()
-                shadowSeekBar.progress=lastStatus.shadow.toInt()
+                fontSizeSeekBar.value = lastStatus.fontSize.toFloat()
+                speedSeekBar.value = lastStatus.speed.toFloat()
+                shadowSeekBar.value = lastStatus.shadow
                 cutoutSwitch.isChecked = lastStatus.cutout
+                fontSize=lastStatus.fontSize
                 speed = lastStatus.speed
                 fontColor = lastStatus.fontColor
                 bgColor = lastStatus.bgColor
@@ -83,8 +87,8 @@ class EditorActivity : AppCompatActivity() {
                     fontColor = fontColor,
                     speed = speed,
                     bgColor = bgColor,
-                    cutout=cutout,
-                    shadow=shadow
+                    cutout = cutout,
+                    shadow = shadow
                 )
                 editorStatusDao.insert(editorStatus)
             }
@@ -139,22 +143,32 @@ class EditorActivity : AppCompatActivity() {
             cutout = isChecked
         }
 
-
-        fontSizeSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                fontSize = 10 + progress // Update selected font size
-
+        fontSizeSeekBar.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                fontSize = value.toInt()
                 editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
             }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        shadowSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                shadow = progress.toFloat()
-
+        }
+        fontSizeSeekBar.setLabelFormatter { value: Float ->
+            val format = NumberFormat.getNumberInstance()
+            format.roundingMode = RoundingMode.DOWN
+            format.maximumFractionDigits = 0
+            format.format(value.toDouble())
+        }
+        speedSeekBar.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                speed = value.toLong()
+            }
+        }
+        speedSeekBar.setLabelFormatter { value: Float ->
+            val format = NumberFormat.getNumberInstance()
+            format.roundingMode = RoundingMode.DOWN
+            format.maximumFractionDigits = 0
+            format.format(value.toDouble())
+        }
+        shadowSeekBar.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                shadow = value
                 editText?.setShadowLayer(
                     shadow,
                     0f,
@@ -162,49 +176,38 @@ class EditorActivity : AppCompatActivity() {
                     fontColor
                 )
             }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        speedSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                speed = (5 + progress).toLong()
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString("editor_text", editText?.text.toString())
-        outState.putInt("font_size", fontSize)
-        lifecycleScope.launch {
-            val editorStatus = EditorStatus(
-                id = 1,
-                text = editText?.text.toString(),
-                fontSize = fontSize,
-                fontColor = fontColor,
-                speed = speed,
-                bgColor = bgColor,
-                cutout=cutout,
-                shadow=shadow
-            )
-            Log.d("EditorActivity", "Saving editor status: $editorStatus")
-            editorStatusDao.update(editorStatus)
         }
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        val editorText =
-            savedInstanceState.getString("editor_text", getString(R.string.default_text))
-        val fontSize = savedInstanceState.getInt("font_size", 60) // Default font size
-        editText?.setText(editorText)
-        editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
+
+        override fun onSaveInstanceState(outState: Bundle) {
+            super.onSaveInstanceState(outState)
+            outState.putString("editor_text", editText?.text.toString())
+            outState.putInt("font_size", fontSize)
+            lifecycleScope.launch {
+                val editorStatus = EditorStatus(
+                    id = 1,
+                    text = editText?.text.toString(),
+                    fontSize = fontSize,
+                    fontColor = fontColor,
+                    speed = speed,
+                    bgColor = bgColor,
+                    cutout = cutout,
+                    shadow = shadow
+                )
+                Log.d("EditorActivity", "Saving editor status: $editorStatus")
+                editorStatusDao.update(editorStatus)
+            }
+        }
+
+        override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+            super.onRestoreInstanceState(savedInstanceState)
+            val editorText =
+                savedInstanceState.getString("editor_text", getString(R.string.default_text))
+            val fontSize = savedInstanceState.getInt("font_size", 60) // Default font size
+            editText?.setText(editorText)
+            editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
+        }
+
+
     }
-
-
-}
