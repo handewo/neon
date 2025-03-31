@@ -10,4 +10,10 @@
     <string name="cutouts">覆盖屏幕挖孔</string>
     <string name="background_color">背景</string>
     <string name="shadow">阴影</string>
+    <string name="orientation_label">锁定屏幕</string>
+    <string name="orientation_no">无</string>
+    <string name="portrait">竖屏</string>
+    <string name="landscape">横屏</string>
+    <string name="reverse_portrait">竖屏（翻转）</string>
+    <string name="reverse_landscape">横屏（翻转）</string>
 </resources>

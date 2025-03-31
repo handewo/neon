@@ -1,7 +1,9 @@
 package com.github.handewo.neon// Replace with your package name
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -20,10 +22,19 @@ import com.google.android.material.textview.MaterialTextView
 
 class DisplayActivity : AppCompatActivity() {
 
+    @SuppressLint("SourceLockedOrientationActivity")
+    private fun setOrientation(o: Int) {
+        when(o) {
+            1 ->requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            2 ->requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            3 -> requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+            4 -> requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_display)
         val displayView = findViewById<View>(R.id.display_scroll)
         val cutoutMode = intent.getBooleanExtra("CUTOUT", false)
@@ -65,7 +76,9 @@ class DisplayActivity : AppCompatActivity() {
         val bgColor = intent.getIntExtra("BG_COLOR", 0xFFFFFFFF.toInt())
         val speed = intent.getLongExtra("SPEED", 200)
         val shadow = intent.getFloatExtra("SHADOW", 30f)
+        val orientation = intent.getIntExtra("ORIENTATION", 0)
 
+        setOrientation(orientation)
         displayView.setBackgroundColor(bgColor)
         displayText.text = neonText
         // Set font size

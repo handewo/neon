@@ -9,4 +9,10 @@
     <string name="cutouts">Extend to cutout</string>
     <string name="background_color">Background</string>
     <string name="shadow">Shadow</string>
+    <string name="orientation_label">Lock orientation</string>
+    <string name="orientation_no">No</string>
+    <string name="portrait">Portrait</string>
+    <string name="landscape">Landscape</string>
+    <string name="reverse_portrait">Reverse portrait</string>
+    <string name="reverse_landscape">Reverse landscape</string>
 </resources>

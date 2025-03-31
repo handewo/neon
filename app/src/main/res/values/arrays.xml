@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="orientation_options">
+        <item>@string/orientation_no</item>
+        <item>@string/portrait</item>
+        <item>@string/landscape</item>
+        <item>@string/reverse_portrait</item>
+        <item>@string/reverse_landscape</item>
+    </string-array>
+</resources>

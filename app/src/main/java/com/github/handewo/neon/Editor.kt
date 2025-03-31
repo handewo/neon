@@ -1,17 +1,18 @@
 package com.github.handewo.neon
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.widget.Button
-import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.google.android.material.slider.Slider
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 import java.math.RoundingMode
@@ -27,6 +28,7 @@ class EditorActivity : AppCompatActivity() {
     private var speed: Long = 200
     private var cutout: Boolean = false
     private var shadow = 30f
+    private var orientation = 0
 
 
     private fun updateEditorFontColor() {
@@ -57,12 +59,15 @@ class EditorActivity : AppCompatActivity() {
         val bgColorButton = findViewById<Button>(R.id.background_color_button)
         val cutoutSwitch = findViewById<SwitchMaterial>(R.id.cutout_switch)
         val shadowSeekBar = findViewById<Slider>(R.id.shadow_seekbar)
+        val orientationMenu = findViewById<MaterialAutoCompleteTextView>(R.id.orientation_view)
         // Restore editor status
         lifecycleScope.launch {
             val db = AppDatabase.getDatabase(applicationContext)
+            val orientationArray = resources.obtainTypedArray(R.array.orientation_options)
             editorStatusDao = db.editorStatusDao()
             val lastStatus = editorStatusDao.getLastStatus()
             if (lastStatus != null) {
+                orientationMenu.setText(orientationArray.getString(lastStatus.orientation),false)
                 Log.d("EditorActivity", "last editor status: $lastStatus")
                 editText?.setText(lastStatus.text)
                 editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, lastStatus.fontSize.toFloat())
@@ -79,6 +84,7 @@ class EditorActivity : AppCompatActivity() {
                 updateEditorFontColor()
                 updateEditorBgColor()
             } else {
+                orientationMenu.setText(orientationArray.getString(0),false)
                 Log.d("EditorActivity", "insert editor status")
                 val editorStatus = EditorStatus(
                     id = 1,
@@ -88,10 +94,12 @@ class EditorActivity : AppCompatActivity() {
                     speed = speed,
                     bgColor = bgColor,
                     cutout = cutout,
-                    shadow = shadow
+                    shadow = shadow,
+                    orientation = orientation
                 )
                 editorStatusDao.insert(editorStatus)
             }
+            orientationArray.recycle()
         }
         val colors = arrayListOf(
             "#ffffff", "#f6e58d", "#ffbe76", "#ff7979", "#badc58", "#dff9fb",
@@ -136,6 +144,7 @@ class EditorActivity : AppCompatActivity() {
             intent.putExtra("SPEED", speed)
             intent.putExtra("CUTOUT", cutout)
             intent.putExtra("SHADOW", shadow)
+            intent.putExtra("ORIENTATION", orientation)
             startActivity(intent)
         }
 
@@ -177,6 +186,12 @@ class EditorActivity : AppCompatActivity() {
                 )
             }
         }
+        orientationMenu.setOnItemClickListener { _, _, position, _ ->
+            Log.d("EditorActivity", "Selected orientation: $position")
+            orientation = position
+        }
+
+
     }
 
 
@@ -193,7 +208,8 @@ class EditorActivity : AppCompatActivity() {
                     speed = speed,
                     bgColor = bgColor,
                     cutout = cutout,
-                    shadow = shadow
+                    shadow = shadow,
+                    orientation = orientation
                 )
                 Log.d("EditorActivity", "Saving editor status: $editorStatus")
                 editorStatusDao.update(editorStatus)

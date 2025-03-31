@@ -16,7 +16,8 @@ data class EditorStatus(
     val speed: Long,
     val bgColor: Int,
     val cutout: Boolean,
-    val shadow: Float
+    val shadow: Float,
+    val orientation: Int
 )
 
 // Create a DAO to access the database
@@ -32,7 +33,7 @@ interface EditorStatusDao {
     suspend fun getLastStatus(): EditorStatus?
 }
 
-@Database(entities = [EditorStatus::class], version = 3)
+@Database(entities = [EditorStatus::class], version = 4)
 abstract class AppDatabase : androidx.room.RoomDatabase() {
     abstract fun editorStatusDao(): EditorStatusDao
 
@@ -48,6 +49,7 @@ abstract class AppDatabase : androidx.room.RoomDatabase() {
                     "editor_database"
                 ).addMigrations(MIGRATION_1_2)
                     .addMigrations(MIGRATION_2_3)
+                    .addMigrations(MIGRATION_3_4)
                     .build()
                 INSTANCE = instance
                 instance
@@ -67,5 +69,12 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
         // Adding a new column called "shadow"
         db.execSQL("ALTER TABLE editor_status ADD COLUMN shadow REAL NOT NULL DEFAULT 30")
+    }
+}
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Adding a new column called "shadow"
+        db.execSQL("ALTER TABLE editor_status ADD COLUMN orientation INT NOT NULL DEFAULT 0")
     }
 }
