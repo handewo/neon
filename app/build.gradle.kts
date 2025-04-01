@@ -13,8 +13,8 @@ android {
         applicationId = "com.github.handewo.neon"
         minSdk = 28
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.3"
+        versionCode = 4
+        versionName = "0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

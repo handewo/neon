@@ -7,7 +7,7 @@
     <string name="font_size">字体大小</string>
     <string name="font_color">字体颜色</string>
     <string name="speed">滚动速度</string>
-    <string name="cutouts">覆盖屏幕挖孔</string>
+    <string name="cutouts">无视屏幕挖孔</string>
     <string name="background_color">背景</string>
     <string name="shadow">阴影</string>
     <string name="orientation_label">锁定屏幕</string>

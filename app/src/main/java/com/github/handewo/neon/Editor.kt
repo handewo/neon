@@ -81,6 +81,7 @@ class EditorActivity : AppCompatActivity() {
                 bgColor = lastStatus.bgColor
                 cutout = lastStatus.cutout
                 shadow = lastStatus.shadow
+                orientation = lastStatus.orientation
                 updateEditorFontColor()
                 updateEditorBgColor()
             } else {

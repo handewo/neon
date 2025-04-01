@@ -6,7 +6,7 @@
     <string name="font_size">Font size</string>
     <string name="font_color">Font color</string>
     <string name="speed">Speed</string>
-    <string name="cutouts">Extend to cutout</string>
+    <string name="cutouts">Display on cutout area</string>
     <string name="background_color">Background</string>
     <string name="shadow">Shadow</string>
     <string name="orientation_label">Lock orientation</string>
