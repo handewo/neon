@@ -27,6 +27,7 @@ class EditorActivity : AppCompatActivity() {
     private var bgColor = 0xFFFFFFFF.toInt()
     private var speed: Long = 200
     private var cutout: Boolean = false
+    private var verticalMode: Boolean= false
     private var shadow = 30f
     private var orientation = 0
 
@@ -58,6 +59,7 @@ class EditorActivity : AppCompatActivity() {
         val fontColorButton = findViewById<Button>(R.id.font_color_button)
         val bgColorButton = findViewById<Button>(R.id.background_color_button)
         val cutoutSwitch = findViewById<SwitchMaterial>(R.id.cutout_switch)
+        val verticalSwitch = findViewById<SwitchMaterial>(R.id.vertical_switch)
         val shadowSeekBar = findViewById<Slider>(R.id.shadow_seekbar)
         val orientationMenu = findViewById<MaterialAutoCompleteTextView>(R.id.orientation_view)
         // Restore editor status
@@ -75,6 +77,7 @@ class EditorActivity : AppCompatActivity() {
                 speedSeekBar.value = lastStatus.speed.toFloat()
                 shadowSeekBar.value = lastStatus.shadow
                 cutoutSwitch.isChecked = lastStatus.cutout
+                verticalSwitch.isChecked = lastStatus.verticalMode
                 fontSize=lastStatus.fontSize
                 speed = lastStatus.speed
                 fontColor = lastStatus.fontColor
@@ -82,6 +85,7 @@ class EditorActivity : AppCompatActivity() {
                 cutout = lastStatus.cutout
                 shadow = lastStatus.shadow
                 orientation = lastStatus.orientation
+                verticalMode = lastStatus.verticalMode
                 updateEditorFontColor()
                 updateEditorBgColor()
             } else {
@@ -96,16 +100,19 @@ class EditorActivity : AppCompatActivity() {
                     bgColor = bgColor,
                     cutout = cutout,
                     shadow = shadow,
-                    orientation = orientation
+                    orientation = orientation,
+                    verticalMode = verticalMode
                 )
                 editorStatusDao.insert(editorStatus)
             }
             orientationArray.recycle()
         }
         val colors = arrayListOf(
-            "#ffffff", "#f6e58d", "#ffbe76", "#ff7979", "#badc58", "#dff9fb",
+            "#ffffff", "#f6e58d", "#FFE7BA", "#ff7979", "#badc58", "#dff9fb",
             "#4CAF50", "#2196F3", "#F44336", "#FF9800", "#FFBB86", "#9E9E9E",
-            "#7ed6df", "#e056fd", "#686de0", "#30336b", "#95afc0", "#000000"
+            "#67C23A", "#E6A23C", "#F56C6C", "#A020F0", "#409EFF", "#FFC1C1",
+            "#7ed6df", "#e056fd", "#686de0", "#30336b", "#95afc0", "#008B8B",
+            "#000000"
         )
         fontColorButton.setOnClickListener {
             MaterialColorPickerDialog.Builder(this)                        // Pass Activity Instance
@@ -151,6 +158,10 @@ class EditorActivity : AppCompatActivity() {
 
         cutoutSwitch.setOnCheckedChangeListener { _, isChecked ->
             cutout = isChecked
+        }
+
+        verticalSwitch.setOnCheckedChangeListener { _, isChecked ->
+            verticalMode = isChecked
         }
 
         fontSizeSeekBar.addOnChangeListener { _, value, fromUser ->
@@ -210,7 +221,8 @@ class EditorActivity : AppCompatActivity() {
                     bgColor = bgColor,
                     cutout = cutout,
                     shadow = shadow,
-                    orientation = orientation
+                    orientation = orientation,
+                    verticalMode = verticalMode,
                 )
                 Log.d("EditorActivity", "Saving editor status: $editorStatus")
                 editorStatusDao.update(editorStatus)

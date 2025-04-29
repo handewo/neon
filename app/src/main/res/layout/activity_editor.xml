@@ -207,11 +207,39 @@
                 android:layout_gravity="end"/>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/linear_vertical_wrapper"
+            style="?android:attr/switchStyle"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:layout_below="@id/linear_switch_wrapper"
+            android:layout_centerHorizontal="true"
+            android:layout_marginVertical="5sp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="13dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/vertical"
+                android:textColor="?android:attr/colorPrimaryDark"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/vertical_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_gravity="end"/>
+        </LinearLayout>
         <Button
             android:id="@+id/display_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/linear_switch_wrapper"
+            android:layout_below="@id/linear_vertical_wrapper"
             android:layout_centerHorizontal="true"
             android:text="@string/display_button_name" />
 
