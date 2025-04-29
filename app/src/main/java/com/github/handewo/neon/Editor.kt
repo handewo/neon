@@ -3,9 +3,13 @@ package com.github.handewo.neon
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import android.util.TypedValue
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
@@ -27,9 +31,10 @@ class EditorActivity : AppCompatActivity() {
     private var bgColor = 0xFFFFFFFF.toInt()
     private var speed: Long = 200
     private var cutout: Boolean = false
-    private var verticalMode: Boolean= false
+    private var verticalMode: Boolean = false
     private var shadow = 30f
     private var orientation = 0
+    private var maxLine = 1
 
 
     private fun updateEditorFontColor() {
@@ -44,6 +49,22 @@ class EditorActivity : AppCompatActivity() {
 
     private fun updateEditorBgColor() {
         editText?.setBackgroundColor(bgColor)
+    }
+
+    private fun updateEditorLine() {
+        editText?.maxLines = maxLine
+    }
+
+    private fun updateEditorMode(maxline:LinearLayout) {
+        if (verticalMode) {
+            editText?.ellipsize = TextUtils.TruncateAt.START
+            editText?.setHorizontallyScrolling(false)
+            maxline.visibility= View.VISIBLE
+        } else {
+            editText?.ellipsize = TextUtils.TruncateAt.END
+            editText?.setHorizontallyScrolling(true)
+            maxline.visibility= View.GONE
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +82,8 @@ class EditorActivity : AppCompatActivity() {
         val cutoutSwitch = findViewById<SwitchMaterial>(R.id.cutout_switch)
         val verticalSwitch = findViewById<SwitchMaterial>(R.id.vertical_switch)
         val shadowSeekBar = findViewById<Slider>(R.id.shadow_seekbar)
+        val maxlineSeekBar = findViewById<Slider>(R.id.maxline_seekbar)
+        val maxLineLinear = findViewById<LinearLayout>(R.id.scrolling_maxline)
         val orientationMenu = findViewById<MaterialAutoCompleteTextView>(R.id.orientation_view)
         // Restore editor status
         lifecycleScope.launch {
@@ -69,16 +92,18 @@ class EditorActivity : AppCompatActivity() {
             editorStatusDao = db.editorStatusDao()
             val lastStatus = editorStatusDao.getLastStatus()
             if (lastStatus != null) {
-                orientationMenu.setText(orientationArray.getString(lastStatus.orientation),false)
+                orientationMenu.setText(orientationArray.getString(lastStatus.orientation), false)
                 Log.d("EditorActivity", "last editor status: $lastStatus")
                 editText?.setText(lastStatus.text)
                 editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, lastStatus.fontSize.toFloat())
                 fontSizeSeekBar.value = lastStatus.fontSize.toFloat()
                 speedSeekBar.value = lastStatus.speed.toFloat()
                 shadowSeekBar.value = lastStatus.shadow
+                maxlineSeekBar.value = lastStatus.maxLine.toFloat()
+
                 cutoutSwitch.isChecked = lastStatus.cutout
                 verticalSwitch.isChecked = lastStatus.verticalMode
-                fontSize=lastStatus.fontSize
+                fontSize = lastStatus.fontSize
                 speed = lastStatus.speed
                 fontColor = lastStatus.fontColor
                 bgColor = lastStatus.bgColor
@@ -86,10 +111,13 @@ class EditorActivity : AppCompatActivity() {
                 shadow = lastStatus.shadow
                 orientation = lastStatus.orientation
                 verticalMode = lastStatus.verticalMode
+                maxLine = lastStatus.maxLine
                 updateEditorFontColor()
                 updateEditorBgColor()
+                updateEditorMode(maxLineLinear)
+                updateEditorLine()
             } else {
-                orientationMenu.setText(orientationArray.getString(0),false)
+                orientationMenu.setText(orientationArray.getString(0), false)
                 Log.d("EditorActivity", "insert editor status")
                 val editorStatus = EditorStatus(
                     id = 1,
@@ -101,7 +129,8 @@ class EditorActivity : AppCompatActivity() {
                     cutout = cutout,
                     shadow = shadow,
                     orientation = orientation,
-                    verticalMode = verticalMode
+                    verticalMode = verticalMode,
+                    maxLine = maxLine
                 )
                 editorStatusDao.insert(editorStatus)
             }
@@ -115,11 +144,11 @@ class EditorActivity : AppCompatActivity() {
             "#000000"
         )
         fontColorButton.setOnClickListener {
-            MaterialColorPickerDialog.Builder(this)                        // Pass Activity Instance
-                .setTitle(getString(R.string.font_color))            // Default "Choose Color"
-                .setColorShape(ColorShape.SQAURE)   // Default ColorShape.CIRCLE
+            MaterialColorPickerDialog.Builder(this)
+                .setTitle(getString(R.string.font_color))
+                .setColorShape(ColorShape.SQAURE)
                 .setColors(colors)
-                .setDefaultColor(0xFF000000.toInt())     // Pass Default Color
+                .setDefaultColor(0xFF000000.toInt())
                 .setColorListener { color, _ ->
                     // Handle Color Selection
                     fontColor = color
@@ -153,6 +182,8 @@ class EditorActivity : AppCompatActivity() {
             intent.putExtra("CUTOUT", cutout)
             intent.putExtra("SHADOW", shadow)
             intent.putExtra("ORIENTATION", orientation)
+            intent.putExtra("VERTICAL_MODE", verticalMode)
+            intent.putExtra("MAX_LINE", maxLine)
             startActivity(intent)
         }
 
@@ -162,6 +193,7 @@ class EditorActivity : AppCompatActivity() {
 
         verticalSwitch.setOnCheckedChangeListener { _, isChecked ->
             verticalMode = isChecked
+            updateEditorMode(maxLineLinear)
         }
 
         fontSizeSeekBar.addOnChangeListener { _, value, fromUser ->
@@ -198,6 +230,18 @@ class EditorActivity : AppCompatActivity() {
                 )
             }
         }
+        maxlineSeekBar.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) {
+                maxLine = value.toInt()
+                updateEditorLine()
+            }
+        }
+        maxlineSeekBar.setLabelFormatter { value: Float ->
+            val format = NumberFormat.getNumberInstance()
+            format.roundingMode = RoundingMode.DOWN
+            format.maximumFractionDigits = 0
+            format.format(value.toDouble())
+        }
         orientationMenu.setOnItemClickListener { _, _, position, _ ->
             Log.d("EditorActivity", "Selected orientation: $position")
             orientation = position
@@ -207,36 +251,37 @@ class EditorActivity : AppCompatActivity() {
     }
 
 
-        override fun onSaveInstanceState(outState: Bundle) {
-            super.onSaveInstanceState(outState)
-            outState.putString("editor_text", editText?.text.toString())
-            outState.putInt("font_size", fontSize)
-            lifecycleScope.launch {
-                val editorStatus = EditorStatus(
-                    id = 1,
-                    text = editText?.text.toString(),
-                    fontSize = fontSize,
-                    fontColor = fontColor,
-                    speed = speed,
-                    bgColor = bgColor,
-                    cutout = cutout,
-                    shadow = shadow,
-                    orientation = orientation,
-                    verticalMode = verticalMode,
-                )
-                Log.d("EditorActivity", "Saving editor status: $editorStatus")
-                editorStatusDao.update(editorStatus)
-            }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("editor_text", editText?.text.toString())
+        outState.putInt("font_size", fontSize)
+        lifecycleScope.launch {
+            val editorStatus = EditorStatus(
+                id = 1,
+                text = editText?.text.toString(),
+                fontSize = fontSize,
+                fontColor = fontColor,
+                speed = speed,
+                bgColor = bgColor,
+                cutout = cutout,
+                shadow = shadow,
+                orientation = orientation,
+                verticalMode = verticalMode,
+                maxLine = maxLine,
+            )
+            Log.d("EditorActivity", "Saving editor status: $editorStatus")
+            editorStatusDao.update(editorStatus)
         }
-
-        override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-            super.onRestoreInstanceState(savedInstanceState)
-            val editorText =
-                savedInstanceState.getString("editor_text", getString(R.string.default_text))
-            val fontSize = savedInstanceState.getInt("font_size", 60) // Default font size
-            editText?.setText(editorText)
-            editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
-        }
-
-
     }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val editorText =
+            savedInstanceState.getString("editor_text", getString(R.string.default_text))
+        val fontSize = savedInstanceState.getInt("font_size", 60) // Default font size
+        editText?.setText(editorText)
+        editText?.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
+    }
+
+
+}

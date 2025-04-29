@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
@@ -77,13 +78,20 @@ class DisplayActivity : AppCompatActivity() {
         val speed = intent.getLongExtra("SPEED", 200)
         val shadow = intent.getFloatExtra("SHADOW", 30f)
         val orientation = intent.getIntExtra("ORIENTATION", 0)
+        val verticalMode = intent.getBooleanExtra("VERTICAL_MODE", false)
+        val maxLine = intent.getIntExtra("MAX_LINE", 1)
 
         setOrientation(orientation)
         displayView.setBackgroundColor(bgColor)
         displayText.text = neonText
         // Set font size
         displayText.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
-
+        if (verticalMode) {
+            Log.d("DisplayActivity", "vertical mode")
+            displayText.maxLines = maxLine
+            displayText.ellipsize = TextUtils.TruncateAt.START
+            displayText.setHorizontallyScrolling(false)
+        }
         // Set neon-like color and glow
         displayText.setTextColor(fontColor)
         displayText.setShadowLayer(

@@ -16,4 +16,5 @@
     <string name="reverse_portrait">Reverse portrait</string>
     <string name="reverse_landscape">Reverse landscape</string>
     <string name="vertical">Vertical scroll</string>
+    <string name="maxline">Max line number</string>
 </resources>

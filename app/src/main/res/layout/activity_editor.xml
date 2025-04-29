@@ -20,12 +20,17 @@
             android:text="@string/default_text"
             android:textSize="60sp"
             android:layout_marginBottom="15dp"/>
-
+        <LinearLayout
+            android:id="@+id/seekbarWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/editor_text"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
         <LinearLayout
             android:id="@+id/font_size_layout"
             android:layout_width="match_parent"
             android:layout_height="65sp"
-            android:layout_below="@id/editor_text"
             android:layout_marginVertical="5sp"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -58,7 +63,6 @@
             android:id="@+id/scrolling_speed"
             android:layout_width="match_parent"
             android:layout_height="65sp"
-            android:layout_below="@id/font_size_layout"
             android:layout_marginVertical="5sp"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -90,7 +94,6 @@
             android:id="@+id/scrolling_shadow"
             android:layout_width="match_parent"
             android:layout_height="65sp"
-            android:layout_below="@id/scrolling_speed"
             android:layout_marginVertical="5sp"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -119,6 +122,39 @@
                 app:labelBehavior="floating" />
         </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/scrolling_maxline"
+                android:layout_width="match_parent"
+                android:layout_height="65sp"
+                android:layout_marginVertical="5sp"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="13dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/maxline"
+                    android:textColor="?android:attr/colorPrimaryDark"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/maxline_seekbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/maxline"
+                    android:value="1"
+                    android:valueFrom="1"
+                    android:valueTo="30"
+                    app:labelBehavior="floating"
+                    app:thumbHeight="25dp"
+                    app:trackHeight="12dp" />
+            </LinearLayout>
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/orientation_layout"
             style="?android:attr/switchStyle"
@@ -126,7 +162,7 @@
             android:layout_height="65sp"
             android:layout_marginStart="13dp"
             android:layout_marginEnd="13dp"
-            android:layout_below="@id/scrolling_shadow"
+            android:layout_below="@id/seekbarWrapper"
             android:layout_centerHorizontal="true"
             android:layout_marginVertical="5sp"
             android:gravity="center_vertical"

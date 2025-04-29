@@ -17,4 +17,5 @@
     <string name="reverse_portrait">竖屏（翻转）</string>
     <string name="reverse_landscape">横屏（翻转）</string>
     <string name="vertical">上下滚动</string>
+    <string name="maxline">最大行数</string>
 </resources>
