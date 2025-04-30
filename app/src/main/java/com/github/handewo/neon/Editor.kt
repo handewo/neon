@@ -34,7 +34,7 @@ class EditorActivity : AppCompatActivity() {
     private var verticalMode: Boolean = false
     private var shadow = 30f
     private var orientation = 0
-    private var maxLine = 1
+    private var maxLine = 3
 
 
     private fun updateEditorFontColor() {
@@ -57,9 +57,10 @@ class EditorActivity : AppCompatActivity() {
 
     private fun updateEditorMode(maxline:LinearLayout) {
         if (verticalMode) {
+            editText?.maxLines = 3
             editText?.ellipsize = TextUtils.TruncateAt.START
             editText?.setHorizontallyScrolling(false)
-            maxline.visibility= View.VISIBLE
+            maxline.visibility= View.GONE
         } else {
             editText?.ellipsize = TextUtils.TruncateAt.END
             editText?.setHorizontallyScrolling(true)
