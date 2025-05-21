@@ -24,6 +24,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.textview.MaterialTextView
 
 class DisplayActivity : AppCompatActivity() {
+    private var cutoutLeft = 0
+    private var cutoutTop = 0
+    private var cutoutRight = 0
+    private var cutoutBottom = 0
+
 
     @SuppressLint("SourceLockedOrientationActivity")
     private fun setOrientation(o: Int) {
@@ -47,18 +52,25 @@ class DisplayActivity : AppCompatActivity() {
         rootView.setOnApplyWindowInsetsListener { _, insets ->
             val cutout = insets.displayCutout
             if (cutout != null && !cutoutMode) {
+                cutoutLeft = cutout.safeInsetLeft
+                cutoutTop = cutout.safeInsetTop
+                cutoutRight = cutout.safeInsetRight
+                cutoutBottom = cutout.safeInsetBottom
                 // Adjust layout to cover the cutout area
                 displayView.setPadding(
-                    cutout.safeInsetLeft,
-                    cutout.safeInsetTop,
-                    cutout.safeInsetRight,
-                    cutout.safeInsetBottom
+                    cutoutLeft,
+                    cutoutTop,
+                    cutoutRight,
+                    cutoutBottom
                 )
-                // ... adjust other margins as needed
             }
             insets
         }
 
+        Log.d(
+            "DisplayActivity",
+            "cutout, left: $cutoutLeft, top: $cutoutTop, right: $cutoutRight, bottom: $cutoutBottom"
+        )
         // Hide system bars using WindowInsetsControllerCompat
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, window.decorView).let { controller ->
@@ -91,19 +103,22 @@ class DisplayActivity : AppCompatActivity() {
         // Set font size
         displayText.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize.toFloat())
 
-        val screenWidth = getScreenWidth(this)
-        val screenHeight = getScreenHeight(this)
+        val screenWidth = getScreenWidth(this, cutoutLeft, cutoutRight)
+        val screenHeight = getScreenHeight(this, cutoutTop, cutoutBottom)
         //displayConstraint.minHeight = screenHeight
 
         if (verticalMode) {
             displayText.ellipsize = TextUtils.TruncateAt.START
-            val height = getTextHeight(neonText, screenWidth, displayText)
+            val height = getTextHeight(neonText, screenWidth, cutoutLeft, cutoutRight, displayText)
             displayText.height = height.toInt()
             displayText.layoutParams.height = height.toInt()
             displayText.layoutParams.width = screenWidth
             displayConstraint.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
             displayText.setHorizontallyScrolling(false)
-            Log.d("DisplayActivity", "vertical mode, height: $height")
+            Log.d(
+                "DisplayActivity",
+                "vertical mode, text height: $height, screen height: $screenHeight, screen width: $screenWidth"
+            )
         } else {
             Log.d("DisplayActivity", "horizontal mode")
             displayText.maxLines = 1
@@ -114,11 +129,12 @@ class DisplayActivity : AppCompatActivity() {
 
         // Scrolling animation
         val animation = if (verticalMode) {
+            val height = getTextHeight(neonText, screenWidth, cutoutLeft, cutoutRight, displayText)
             ObjectAnimator.ofFloat(
                 displayText,
                 "translationY",
-                screenHeight.toFloat(),
-                -getTextHeight(neonText, screenWidth, displayText)
+                screenHeight.toFloat() + (height - screenHeight) / 2,
+                -height
             )
         } else {
             ObjectAnimator.ofFloat(
@@ -146,28 +162,47 @@ class DisplayActivity : AppCompatActivity() {
         if (!verticalMode && screenWidth < textWidth) {
             animation.start()
         }
-        if (verticalMode && screenHeight < getTextHeight(neonText, screenWidth, displayText)) {
+        if (verticalMode && screenHeight < getTextHeight(
+                neonText,
+                screenWidth,
+                cutoutLeft,
+                cutoutRight,
+                displayText
+            )
+        ) {
             animation.start()
         }
     }
 }
 
-fun getScreenWidth(context: Context): Int {
+fun getScreenWidth(context: Context, cutoutLeft: Int, cutoutRight: Int): Int {
     val metrics: DisplayMetrics = context.resources.displayMetrics
-    return metrics.widthPixels
+    return metrics.widthPixels - cutoutLeft - cutoutRight
 }
 
-fun getScreenHeight(context: Context): Int {
+fun getScreenHeight(context: Context, cutoutTop: Int, cutoutBottom: Int): Int {
     val metrics: DisplayMetrics = context.resources.displayMetrics
-    return metrics.heightPixels
+    return metrics.heightPixels - cutoutTop - cutoutBottom
 }
 
-fun getTextHeight(text: String, screenWidth: Int, displayText: MaterialTextView): Float {
+fun getTextHeight(
+    text: String,
+    screenWidth: Int,
+    cutoutLeft: Int,
+    cutoutRight: Int,
+    displayText: MaterialTextView
+): Float {
     val paint = displayText.paint
     val textPaint = TextPaint()
     textPaint.textSize = displayText.textSize
     textPaint.typeface = displayText.typeface
-    val staticLayout = StaticLayout.Builder.obtain(text, 0, text.length, paint, screenWidth)
+    val staticLayout = StaticLayout.Builder.obtain(
+        text,
+        0,
+        text.length,
+        paint,
+        screenWidth - cutoutLeft - cutoutRight
+    )
         .build()
     val numLines = staticLayout.lineCount
     val fm = paint.fontMetrics
